@@ -1,0 +1,34 @@
+[Unit]
+Description=Monad Node Monitoring
+Documentation=https://github.com/dragonflylabsxyz/monad-node-monitor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=monad
+Group=monad
+
+# Working directory holds the .last_height / .last_status state files.
+WorkingDirectory=/opt/monad-node-monitor
+
+# Binary installed by install.sh
+ExecStart=/usr/local/bin/monad-monitoring
+
+# Load secrets from the .env file — never hard-code tokens.
+EnvironmentFile=/opt/monad-node-monitor/.env
+
+# Restart on any non-zero exit; give the network 5 s to recover first.
+Restart=always
+RestartSec=5
+StartLimitIntervalSec=0
+
+# Harden the process: read-only filesystem except for the working dir.
+ProtectSystem=strict
+ReadWritePaths=/opt/monad-node-monitor
+ProtectHome=true
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
